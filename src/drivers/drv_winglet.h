@@ -17,7 +17,6 @@
 #define UAVCAN2_WINGLET_DEVICE_PATH		"/dev/uavcan/winglet2"
 #define UAVCAN3_WINGLET_DEVICE_PATH		"/dev/uavcan/winglet3"
 
-#include <uORB/topics/debug_key_value.h>
-#include <uORB/topics/log_message.h>
+#include <uORB/topics/sensor_winglet.h>
 
 #endif // _DRV_WINGLET_H

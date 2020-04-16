@@ -37,18 +37,18 @@ int winglet_main(int argc, char *argv[])
 	float xyzw[4][4];
 
 	// Print 5 instances
-	for (int i = 0; i < 5; i++)
+	for (int instance = 0; instance < 5; instance++)
 	{
-		for(int n = 0; n < 4; n++)
+		for(int channel = 0; channel < 4; channel++)
 		{
 			/* wait for sensor update of 1 file descriptor for 1000 ms (1 second) */
-			int poll_ret = px4_poll(&(winglets[n]), 1, 1000);
+			int poll_ret = px4_poll(&(winglets[channel]), 1, 1000);
 
 			/* handle the poll result */
 			if (poll_ret == 0)
 			{
 				/* this means none of our providers is giving us data */
-				PX4_ERR("Got no data from winglet %d within a second", n);
+				PX4_ERR("Got no data from winglet %d within a second", channel);
 			}
 			else if (poll_ret < 0)
 			{
@@ -64,14 +64,17 @@ int winglet_main(int argc, char *argv[])
 			else
 			{
 
-				if(winglets[n].revents & POLLIN)
+				if(winglets[channel].revents & POLLIN)
 				{
 					/* obtained data for the file descriptor */
 					struct sensor_winglet_s winglet;
+
 					/* copy sensors raw data into local buffer */
-					orb_copy(ORB_ID(sensor_winglet), sensor_winglet_fd[n], &winglet);
+					orb_copy(ORB_ID(sensor_winglet), sensor_winglet_fd[channel], &winglet);
+
+					/* print faw data */
 					PX4_INFO("\nChannel %d:\n  Timestamp: %llu\n  ID: %d\n  X: %f\n  Y: %f\n  Z: %f\n  W: %f\n",
-						n,
+						channel,
 						winglet.timestamp,
 						winglet.id,
 						(double)winglet.x,
@@ -80,6 +83,7 @@ int winglet_main(int argc, char *argv[])
 						(double)winglet.w
 					);
 
+					/* store raw data according to id */
 					xyzw[winglet.id][0] = winglet.x;
 					xyzw[winglet.id][1] = winglet.y;
 					xyzw[winglet.id][2] = winglet.z;
@@ -90,25 +94,25 @@ int winglet_main(int argc, char *argv[])
 
 		// Calculate quaternion dot product
 		double dots[] = {0, 0, 0, 0};
-		for(int j = 0; j < 4; j++)
+		for(int joint = 0; joint < 4; joint++)
 		{
 			for(int k = 0; k < 4; k++)
 			{
-				dots[j] += (double)(xyzw[j][k]*xyzw[(j+1)%4][k]);
+				dots[joint] += (double)(xyzw[joint][k]*xyzw[(joint+1)%4][k]);
 			}
 		}
 
 		// Compute angles between adjacent unit quaternions
 		double angles[4];
-		for(int j = 0; j < 4; j++)
+		for(int joint = 0; joint < 4; joint++)
 		{
-			angles[j] = 2 * acos(dots[j]) / 3.14 * 180;
+			angles[joint] = 2 * acos(dots[joint]) / 3.14 * 180;
 		}
 
 		// Print angles
-		for(int j = 0; j < 4; j++)
+		for(int joint = 0; joint < 4; joint++)
 		{
-			PX4_INFO("Angle %d: %f deg", j, angles[j]);
+			PX4_INFO("Angle %d: %f deg", joint, angles[joint]);
 		}
 	}
 
