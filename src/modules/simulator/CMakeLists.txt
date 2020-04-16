@@ -74,5 +74,6 @@ px4_add_module(
 		drivers_barometer
 		drivers_gyroscope
 		drivers_magnetometer
+		drivers_winglet
 	)
 target_include_directories(modules__simulator INTERFACE ${PX4_SOURCE_DIR}/mavlink/include/mavlink)
