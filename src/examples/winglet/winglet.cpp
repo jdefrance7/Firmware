@@ -112,7 +112,7 @@ int winglet_main(int argc, char *argv[])
 		// Print angles
 		for(int joint = 0; joint < 4; joint++)
 		{
-			PX4_INFO("Angle %d: %f deg", joint, angles[joint]);
+			PX4_INFO("Angle %d_%d: %f deg", joint, (joint+1)%4, angles[joint]);
 		}
 	}
 
