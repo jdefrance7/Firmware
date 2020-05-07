@@ -40,4 +40,5 @@ add_subdirectory(led)
 add_subdirectory(magnetometer)
 add_subdirectory(rangefinder)
 add_subdirectory(smbus)
-add_subdirectory(winglet)
+
+add_subdirectory(winglet)     ##< Winglet module added here

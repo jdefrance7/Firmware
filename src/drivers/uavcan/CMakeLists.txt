@@ -130,7 +130,8 @@ px4_add_module(
 		sensors/flow.cpp
 		sensors/gnss.cpp
 		sensors/mag.cpp
-		sensors/winglet.cpp
+		
+		sensors/winglet.cpp 				##< Winglet module added here
 
 	DEPENDS
 		px4_uavcan_dsdlc

@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- *   Copyright (C) 2014 PX4 Development Team. All rights reserved.
+ *   Copyright (C) 2014, 2020 PX4 Development Team. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,6 +33,8 @@
 
 /**
  * @author Pavel Kirienko <pavel.kirienko@gmail.com>
+ *
+ * @edited Joe DeFrance
  */
 
 #include "sensor_bridge.hpp"
@@ -44,7 +46,8 @@
 #include "gnss.hpp"
 #include "flow.hpp"
 #include "mag.hpp"
-#include "winglet.hpp"
+
+#include "winglet.hpp" 			//< Winglet module included here
 
 /*
  * IUavcanSensorBridge
@@ -57,7 +60,8 @@ void IUavcanSensorBridge::make_all(uavcan::INode &node, List<IUavcanSensorBridge
 	list.add(new UavcanFlowBridge(node));
 	list.add(new UavcanBatteryBridge(node));
 	list.add(new UavcanDifferentialPressureBridge(node));
-	list.add(new UavcanWingletBridge(node));
+
+	list.add(new UavcanWingletBridge(node)); 			//< Winglet module added here
 }
 
 /*
