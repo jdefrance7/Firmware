@@ -32,9 +32,9 @@
  ****************************************************************************/
 
 /**
- *  @file winglet.hpp
+ *  @file wing_segment.hpp
  *
- *	UAVCAN sensor bridge class for winglet AngularCommand messages.
+ *	UAVCAN sensor bridge class for wing segment AngularCommand messages.
  *
  *	@author Joe DeFrance
  */
@@ -54,10 +54,10 @@
 // uORB Sources
 #include <uORB/uORB.h>
 #include <uORB/PublicationMulti.hpp>
-#include <uORB/topics/sensor_winglet.h>
+#include <uORB/topics/sensor_wing_segment.h>
 
-// UavcanWingletBridge Class
-class UavcanWingletBridge : public UavcanCDevSensorBridgeBase
+// UavcanWingSegmentBridge Class
+class UavcanWingSegmentBridge : public UavcanCDevSensorBridgeBase
 {
 public:
 
@@ -65,7 +65,7 @@ public:
 	static const char *const NAME;
 
 	// Constuctor
-	UavcanWingletBridge(uavcan::INode &node);
+	UavcanWingSegmentBridge(uavcan::INode &node);
 
 	// Name getter
 	const char *get_name() const override { return NAME; }
@@ -82,8 +82,8 @@ private:
 	void uavcan_angular_command_cb(const uavcan::ReceivedDataStructure<uavcan::equipment::camera_gimbal::AngularCommand> &msg);
 
 	// UAVCAN callback binder
-	typedef uavcan::MethodBinder<UavcanWingletBridge *,
-		void (UavcanWingletBridge::*)(const uavcan::ReceivedDataStructure<uavcan::equipment::camera_gimbal::AngularCommand>&)>
+	typedef uavcan::MethodBinder<UavcanWingSegmentBridge *,
+		void (UavcanWingSegmentBridge::*)(const uavcan::ReceivedDataStructure<uavcan::equipment::camera_gimbal::AngularCommand>&)>
 		AngularCommandCallback;
 
 	// UAVCAN subscription

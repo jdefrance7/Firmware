@@ -32,7 +32,7 @@
  ****************************************************************************/
 
 /**
- * 	@file PX4Winglet.hpp
+ * 	@file PX4WingSegment.hpp
  *
  *	Driver file to publish wing segment orientation information.
  *
@@ -41,31 +41,30 @@
 
 #pragma once
 
-#include <drivers/drv_winglet.h>
+#include <drivers/drv_wing_segment.h>
 #include <drivers/drv_hrt.h>
 
 #include <lib/cdev/CDev.hpp>
 
 #include <uORB/uORB.h>
 #include <uORB/PublicationMulti.hpp>
-#include <uORB/topics/sensor_winglet.h>
+#include <uORB/topics/sensor_wing_segment.h>
 
-class PX4Winglet : public cdev::CDev
+class PX4WingSegment : public cdev::CDev
 {
 public:
 
 	// Constructor
-	PX4Winglet(uint32_t device_id, uint8_t priority = ORB_PRIO_DEFAULT);
+	PX4WingSegment(uint32_t device_id, uint8_t priority = ORB_PRIO_DEFAULT);
 
 	// Destructor
-	~PX4Winglet() override;
+	~PX4WingSegment() override;
 
 	// uORB topic getter
-	const sensor_winglet_s &get() { return _sensor_winglet_pub.get(); }
+	const sensor_wing_segment_s &get() { return _sensor_wing_segment_pub.get(); }
 
 	// Publisher calls
-	void update(hrt_abstime timestamp_sample, uint8_t id, char key, float value);
-	void update(hrt_abstime timestamp_sample, uint8_t node_id, uint8_t wing_segment_id, float x, float y, float z, float w);
+	void update(hrt_abstime timestamp_sample, uint8_t node_id, uint8_t id, uint8_t callibration, float x, float y, float z, float w);
 
 	// Class instance getter
 	int get_class_instance() { return _class_device_instance; };
@@ -76,10 +75,13 @@ public:
 private:
 
 	// uORB Multi-Instance Topic
-	uORB::PublicationMultiData<sensor_winglet_s> _sensor_winglet_pub;
+	uORB::PublicationMultiData<sensor_wing_segment_s> _sensor_wing_segment_pub;
 
 	// Last received wing segment id
 	uint8_t _id;
+
+	// Last received wing segment callibration
+	uint8_t _callibration;
 
 	// Last received wing segment orientation
 	float _xyzw[4];

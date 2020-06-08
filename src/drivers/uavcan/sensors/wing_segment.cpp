@@ -32,7 +32,7 @@
  ****************************************************************************/
 
  /**
-  *  @file winglet.cpp
+  *  @file wing_segment.cpp
   *
   *	UAVCAN sensor bridge class for winglet AngularCommand messages.
   *
@@ -41,7 +41,7 @@
 
 
 // Header file
-#include "winglet.hpp"
+#include "wing_segment.hpp"
 
 // Timer
 #include <drivers/drv_hrt.h>
@@ -50,28 +50,28 @@
 #include <systemlib/err.h>
 
 // PX4Winglet class (handles multiple winglet instances)
-#include <lib/drivers/winglet/PX4Winglet.hpp>
+#include <lib/drivers/wing_segment/PX4WingSegment.hpp>
 
 // Class name
-const char *const UavcanWingletBridge::NAME = "winglet";
+const char *const UavcanWingSegmentBridge::NAME = "wing_segment";
 
 // Base path
-#define UAVCAN_WINGLET_BASE_DEVICE_PATH "/dev/uavcan/winglet"
+#define UAVCAN_WING_SEGMENT_BASE_DEVICE_PATH "/dev/uavcan/wing_segment"
 
 // Constructor
-UavcanWingletBridge::UavcanWingletBridge(uavcan::INode &node) :
+UavcanWingSegmentBridge::UavcanWingSegmentBridge(uavcan::INode &node) :
 	UavcanCDevSensorBridgeBase(
-		"uavcan_winglet",
-		UAVCAN_WINGLET_BASE_DEVICE_PATH,
-		UAVCAN_WINGLET_BASE_DEVICE_PATH,
-		ORB_ID(sensor_winglet)
+		"uavcan_wing_segment",
+		UAVCAN_WING_SEGMENT_BASE_DEVICE_PATH,
+		UAVCAN_WING_SEGMENT_BASE_DEVICE_PATH,
+		ORB_ID(sensor_wing_segment)
 	),
 	_sub_uavcan_angular_command(node)
 {
 }
 
 // Initializer
-int UavcanWingletBridge::init()
+int UavcanWingSegmentBridge::init()
 {
 	int res = device::CDev::init();
 
@@ -79,7 +79,7 @@ int UavcanWingletBridge::init()
 		return res;
 	}
 
-	res = _sub_uavcan_angular_command.start(AngularCommandCallback(this, &UavcanWingletBridge::uavcan_angular_command_cb));
+	res = _sub_uavcan_angular_command.start(AngularCommandCallback(this, &UavcanWingSegmentBridge::uavcan_angular_command_cb));
 
 	if(res < 0) {
 		PX4_ERR("failed to start uavcan angular command sub: %d", res);
@@ -90,7 +90,7 @@ int UavcanWingletBridge::init()
 }
 
 // Callback function
-void UavcanWingletBridge::uavcan_angular_command_cb(const
+void UavcanWingSegmentBridge::uavcan_angular_command_cb(const
 	uavcan::ReceivedDataStructure<uavcan::equipment::camera_gimbal::AngularCommand> &msg)
 {
 	// Get allocated sensor channel
@@ -99,14 +99,14 @@ void UavcanWingletBridge::uavcan_angular_command_cb(const
 	if(channel == nullptr)
 	{
 		// Something went wrong - no channel to publish on; return
-		PX4_ERR("No channel to publush sensor_winglet on");
+		PX4_ERR("No channel to publush sensor_wing_segment on");
 		return;
 	}
 
 	// Get instance of winglet publisher
-	PX4Winglet *winglet = (PX4Winglet *)channel->h_driver;
+	PX4WingSegment *wing_segment = (PX4WingSegment *)channel->h_driver;
 
-	if(winglet == nullptr)
+	if(wing_segment == nullptr)
 	{
 		return;
 	}
@@ -115,7 +115,11 @@ void UavcanWingletBridge::uavcan_angular_command_cb(const
 	uint8_t node_id =  msg.getSrcNodeID().get();
 
 	// Extract wing segment id from AngularCommand message
-	uint8_t gimbal_id = msg.gimbal_id;
+	uint8_t id = msg.gimbal_id;
+
+	// Extract wing segment callibration from AngularCommand message
+	uint8_t callibration;
+	memcpy((void*)(&callibration), (void*)(&msg.mode), 1); // need memcpy due to UAVCAN data types
 
 	// Extract quaternion data from AngularCommand message
 	float x = msg.quaternion_xyzw[0];
@@ -123,33 +127,33 @@ void UavcanWingletBridge::uavcan_angular_command_cb(const
 	float z = msg.quaternion_xyzw[2];
 	float w = msg.quaternion_xyzw[3];
 
-	// Send extracted values to winglet publisher
-	winglet->update(hrt_absolute_time(), node_id, gimbal_id, x, y, z, w);
+	// Send extracted values to wing segment publisher
+	wing_segment->update(hrt_absolute_time(), node_id, id, callibration, x, y, z, w);
 }
 
 // Driver initializer (uses PX4Winglet to create multiple instances of winglet)
-int UavcanWingletBridge::init_driver(uavcan_bridge::Channel *channel)
+int UavcanWingSegmentBridge::init_driver(uavcan_bridge::Channel *channel)
 {
 	DeviceId device_id{_device_id};
 
 	device_id.devid_s.devtype = DRV_DEVTYPE_UNUSED;
 	device_id.devid_s.address = static_cast<uint8_t>(channel->node_id);
 
-	channel->h_driver = new PX4Winglet(device_id.devid, ORB_PRIO_HIGH);
+	channel->h_driver = new PX4WingSegment(device_id.devid, ORB_PRIO_HIGH);
 
 	if(channel->h_driver == nullptr)
 	{
 		return PX4_ERROR;
 	}
 
-	PX4Winglet *winglet = (PX4Winglet *)channel->h_driver;
+	PX4WingSegment *wing_segment = (PX4WingSegment *)channel->h_driver;
 
-	channel->class_instance = winglet->get_class_instance();
+	channel->class_instance = wing_segment->get_class_instance();
 
 	if(channel->class_instance < 0)
 	{
-		PX4_ERR("UavcanWinget: unable to get a class instance");
-		delete winglet;
+		PX4_ERR("UavcanWingSegment: unable to get a class instance");
+		delete wing_segment;
 		channel->h_driver = nullptr;
 		return PX4_ERROR;
 	}

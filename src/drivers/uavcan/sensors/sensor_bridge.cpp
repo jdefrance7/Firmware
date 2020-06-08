@@ -46,8 +46,7 @@
 #include "gnss.hpp"
 #include "flow.hpp"
 #include "mag.hpp"
-
-#include "winglet.hpp" 			//< Winglet module included here
+#include "wing_segment.hpp" 			//< Winglet module included here
 
 /*
  * IUavcanSensorBridge
@@ -60,8 +59,7 @@ void IUavcanSensorBridge::make_all(uavcan::INode &node, List<IUavcanSensorBridge
 	list.add(new UavcanFlowBridge(node));
 	list.add(new UavcanBatteryBridge(node));
 	list.add(new UavcanDifferentialPressureBridge(node));
-
-	list.add(new UavcanWingletBridge(node)); 			//< Winglet module added here
+	list.add(new UavcanWingSegmentBridge(node)); 			//< Winglet module added here
 }
 
 /*

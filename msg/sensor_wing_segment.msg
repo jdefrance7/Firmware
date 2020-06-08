@@ -4,6 +4,7 @@
 
 uint64 timestamp    # timestamp of when the data was received
 uint8 id            # wing segment identification number
+uint8 callibration  # wing segment sensor callibration
 float32 x           # unit quaternion x-value
 float32 y           # unit quaternion y-value
 float32 z           # unit quaternion z-value

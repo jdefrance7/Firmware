@@ -66,7 +66,7 @@ px4_add_module(
 		drivers_barometer
 		drivers_gyroscope
 		drivers_magnetometer
-		drivers_winglet
+		drivers_wing_segment 		##< Wing Segment module added here
 		git_mavlink_v2
 		conversion
 		git_ecl

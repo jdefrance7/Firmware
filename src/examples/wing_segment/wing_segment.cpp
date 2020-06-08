@@ -32,7 +32,7 @@
  ****************************************************************************/
 
 /**
- *	@file winglet.cpp
+ *	@file wing_segment.cpp
  *
  *	Example of winglet uORB topic subscription and printing.
  *
@@ -49,13 +49,13 @@
 #include <math.h>
 
 #include <uORB/uORB.h>
-#include <uORB/topics/sensor_winglet.h>
+#include <uORB/topics/sensor_wing_segment.h>
 
-extern "C" __EXPORT int winglet_main(int argc, char *argv[]);
+extern "C" __EXPORT int wing_segment_main(int argc, char *argv[]);
 
-int winglet_main(int argc, char *argv[])
+int wing_segment_main(int argc, char *argv[])
 {
-	PX4_INFO("Entering Winglet...");
+	PX4_INFO("Entering Wing Segment Main...");
 
 	// PX4_INFO("Argv:");
 	// for (int i = 0; i < argc; ++i)
@@ -63,14 +63,14 @@ int winglet_main(int argc, char *argv[])
 	// 	PX4_INFO("  %d: %s", i, argv[i]);
 	// }
 
-	int sensor_winglet_fd[4];
+	int sensor_wing_segment_fd[4];
 
-	px4_pollfd_struct_t winglets[4];
+	px4_pollfd_struct_t wing_segment[4];
 
 	for(int n = 0; n < 4; n++)
 	{
-		sensor_winglet_fd[n] = orb_subscribe_multi(ORB_ID(sensor_winglet), n);
-		winglets[n] = {.fd = sensor_winglet_fd[n], .events = POLLIN};
+		sensor_wing_segment_fd[n] = orb_subscribe_multi(ORB_ID(sensor_wing_segment), n);
+		wing_segment[n] = {.fd = sensor_wing_segment_fd[n], .events = POLLIN};
 	}
 
 	int error_counter = 0;
@@ -83,7 +83,7 @@ int winglet_main(int argc, char *argv[])
 		for(int channel = 0; channel < 4; channel++)
 		{
 			/* wait for sensor update of 1 file descriptor for 1000 ms (1 second) */
-			int poll_ret = px4_poll(&(winglets[channel]), 1, 1000);
+			int poll_ret = px4_poll(&(wing_segment[channel]), 1, 1000);
 
 			/* handle the poll result */
 			if (poll_ret == 0)
@@ -105,30 +105,31 @@ int winglet_main(int argc, char *argv[])
 			else
 			{
 
-				if(winglets[channel].revents & POLLIN)
+				if(wing_segment[channel].revents & POLLIN)
 				{
 					/* obtained data for the file descriptor */
-					struct sensor_winglet_s winglet;
+					struct sensor_wing_segment_s wing_segment_msg;
 
 					/* copy sensors raw data into local buffer */
-					orb_copy(ORB_ID(sensor_winglet), sensor_winglet_fd[channel], &winglet);
+					orb_copy(ORB_ID(sensor_wing_segment), sensor_wing_segment_fd[channel], &wing_segment_msg);
 
 					/* print faw data */
-					PX4_INFO("\nChannel %d:\n  Timestamp: %llu\n  ID: %d\n  X: %f\n  Y: %f\n  Z: %f\n  W: %f\n",
+					PX4_INFO("\nChannel %d:\n  Timestamp: %llu\n  ID: %d\n  CAL: %d\n  X: %f\n  Y: %f\n  Z: %f\n  W: %f\n",
 						channel,
-						winglet.timestamp,
-						winglet.id,
-						(double)winglet.x,
-						(double)winglet.y,
-						(double)winglet.z,
-						(double)winglet.w
+						wing_segment_msg.timestamp,
+						wing_segment_msg.id,
+						wing_segment_msg.callibration,
+						(double)wing_segment_msg.x,
+						(double)wing_segment_msg.y,
+						(double)wing_segment_msg.z,
+						(double)wing_segment_msg.w
 					);
 
 					/* store raw data according to id */
-					xyzw[winglet.id][0] = winglet.x;
-					xyzw[winglet.id][1] = winglet.y;
-					xyzw[winglet.id][2] = winglet.z;
-					xyzw[winglet.id][3] = winglet.w;
+					xyzw[wing_segment_msg.id][0] = wing_segment_msg.x;
+					xyzw[wing_segment_msg.id][1] = wing_segment_msg.y;
+					xyzw[wing_segment_msg.id][2] = wing_segment_msg.z;
+					xyzw[wing_segment_msg.id][3] = wing_segment_msg.w;
 				}
 			}
 		}
@@ -157,7 +158,7 @@ int winglet_main(int argc, char *argv[])
 		}
 	}
 
-	PX4_INFO("Exiting Winglet...");
+	PX4_INFO("Exiting Wing Segment Main...");
 
 	return 0;
 }

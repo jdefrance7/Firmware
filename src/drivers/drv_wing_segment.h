@@ -32,15 +32,15 @@
  ****************************************************************************/
 
 /**
- *  @file drv_winglet.h
+ *  @file drv_wing_segment.h
  *
- *  Winglet driver interface.
+ *  Wing segment driver interface.
  *
  *  @author Joe DeFrance
  */
 
-#ifndef _DRV_WINGLET_H
-#define _DRV_WINGLET_H
+#ifndef _DRV_WING_SEGMENT_H
+#define _DRV_WING_SEGMENT_H
 
 #include <stdint.h>
 #include <sys/ioctl.h>
@@ -49,14 +49,14 @@
 #include "drv_orb_dev.h"
 
 // Base device path name
-#define UAVCAN_WINGLET_BASE_DEVICE_PATH		 "/dev/uavcan/winglet"
+#define UAVCAN_WING_SEGMENT_BASE_DEVICE_PATH	"/dev/uavcan/wing_segment"
 
 // Multi-instance path names
-#define UAVCAN0_WINGLET_DEVICE_PATH		     "/dev/uavcan/winglet0"
-#define UAVCAN1_WINGLET_DEVICE_PATH		     "/dev/uavcan/winglet1"
-#define UAVCAN2_WINGLET_DEVICE_PATH		     "/dev/uavcan/winglet2"
-#define UAVCAN3_WINGLET_DEVICE_PATH		     "/dev/uavcan/winglet3"
+#define UAVCAN0_WING_SEGMENT_DEVICE_PATH	"/dev/uavcan/wing_segment_0"
+#define UAVCAN1_WING_SEGMENT_DEVICE_PATH	"/dev/uavcan/wing_segment_1"
+#define UAVCAN2_WING_SEGMENT_DEVICE_PATH	"/dev/uavcan/wing_segment_2"
+#define UAVCAN3_WING_SEGMENT_DEVICE_PATH	"/dev/uavcan/wing_segment_3"
 
-#include <uORB/topics/sensor_winglet.h>
+#include <uORB/topics/sensor_wing_segment.h>
 
-#endif // _DRV_WINGLET_H
+#endif // _DRV_WING_SEGMENT_H

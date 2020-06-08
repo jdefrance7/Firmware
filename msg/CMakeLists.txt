@@ -124,7 +124,7 @@ set(msg_files
 	sensor_mag.msg
 	sensor_preflight.msg
 	sensor_selection.msg
-	sensor_winglet.msg 								##< Winglet module added here
+	sensor_wing_segment.msg								##< Wing Segment module added here
 	servorail_status.msg
 	subsystem_info.msg
 	system_power.msg

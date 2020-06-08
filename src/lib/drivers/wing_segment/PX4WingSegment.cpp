@@ -32,95 +32,63 @@
  ****************************************************************************/
 
  /**
-  * 	@file PX4Winglet.cpp
+  * 	@file PX4WingSegment.cpp
   *
   *		Driver file to publish wing segment orientation information.
   *
   * 	@author Joe DeFrance
   */
 
-#include "PX4Winglet.hpp"
+#include "PX4WingSegment.hpp"
 
 #include <lib/drivers/device/Device.hpp>
 
-PX4Winglet::PX4Winglet(uint32_t device_id, uint8_t priority) :
+PX4WingSegment::PX4WingSegment(uint32_t device_id, uint8_t priority) :
 	CDev(nullptr),
-	_sensor_winglet_pub{ORB_ID(sensor_winglet), priority}
+	_sensor_wing_segment_pub{ORB_ID(sensor_wing_segment), priority}
 {
-	_class_device_instance = register_class_devname(UAVCAN_WINGLET_BASE_DEVICE_PATH);
+	_class_device_instance = register_class_devname(UAVCAN_WING_SEGMENT_BASE_DEVICE_PATH);
 
-	_sensor_winglet_pub.get().timestamp = 0;
-	_sensor_winglet_pub.get().id = 0;
-	_sensor_winglet_pub.get().x = 0;
-	_sensor_winglet_pub.get().y = 0;
-	_sensor_winglet_pub.get().z = 0;
-	_sensor_winglet_pub.get().w = 0;
+	_sensor_wing_segment_pub.get().timestamp = 0;
+	_sensor_wing_segment_pub.get().id = 0;
+	_sensor_wing_segment_pub.get().callibration = 0;
+	_sensor_wing_segment_pub.get().x = 0;
+	_sensor_wing_segment_pub.get().y = 0;
+	_sensor_wing_segment_pub.get().z = 0;
+	_sensor_wing_segment_pub.get().w = 0;
 }
 
-PX4Winglet::~PX4Winglet()
+PX4WingSegment::~PX4WingSegment()
 {
 	if(_class_device_instance != -1)
 	{
-		unregister_class_devname(UAVCAN_WINGLET_BASE_DEVICE_PATH, _class_device_instance);
+		unregister_class_devname(UAVCAN_WING_SEGMENT_BASE_DEVICE_PATH, _class_device_instance);
 	}
 }
 
-void PX4Winglet::update(hrt_abstime timestamp_sample, uint8_t id, char key, float value)
+void PX4WingSegment::update(hrt_abstime timestamp_sample, uint8_t node_id, uint8_t id, uint8_t callibration, float x, float y, float z, float w)
 {
 	_id = id;
-
-	if(key == 'X')
-	{
-		_xyzw[0] = value;
-	}
-	else if(key == 'Y')
-	{
-		_xyzw[1] = value;
-	}
-	else if(key == 'Z')
-	{
-		_xyzw[2] = value;
-	}
-	else if(key == 'W')
-	{
-		_xyzw[3] = value;
-	}
-	else
-	{
-		PX4_WARN("unknown key: %c", key);
-	}
-
-	sensor_winglet_s &report = _sensor_winglet_pub.get();
-	report.timestamp = timestamp_sample;
-	report.id = _id;
-	report.x = _xyzw[0];
-	report.y = _xyzw[1];
-	report.z = _xyzw[2];
-	report.w = _xyzw[3];
-	_sensor_winglet_pub.update();
-}
-
-void PX4Winglet::update(hrt_abstime timestamp_sample, uint8_t node_id, uint8_t wing_segment_id, float x, float y, float z, float w)
-{
-	_id = wing_segment_id;
+	_callibration = callibration;
 	_xyzw[0] = x;
 	_xyzw[1] = y;
 	_xyzw[2] = z;
 	_xyzw[3] = w;
 
-	sensor_winglet_s &report = _sensor_winglet_pub.get();
+	sensor_wing_segment_s &report = _sensor_wing_segment_pub.get();
 	report.timestamp = timestamp_sample;
 	report.id = _id;
+	report.callibration = _callibration;
 	report.x = _xyzw[0];
 	report.y = _xyzw[1];
 	report.z = _xyzw[2];
 	report.w = _xyzw[3];
-	_sensor_winglet_pub.update();
+	_sensor_wing_segment_pub.update();
 }
 
-void PX4Winglet::print_status()
+void PX4WingSegment::print_status()
 {
-	PX4_INFO(UAVCAN_WINGLET_BASE_DEVICE_PATH "device instance: %d", _class_device_instance);
+	PX4_INFO(UAVCAN_WING_SEGMENT_BASE_DEVICE_PATH "device instance: %d", _class_device_instance);
 
-	print_message(_sensor_winglet_pub.get());
+	print_message(_sensor_wing_segment_pub.get());
 }

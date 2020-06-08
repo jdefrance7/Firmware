@@ -120,7 +120,7 @@ px4_add_board(
 		ver
 		work_queue
 	EXAMPLES
-		winglet 		##< Winglet module added here
+		wing_segment 		##< Wing Segment module added here
 		fixedwing_control # Tutorial code from https://px4.io/dev/example_fixedwing_control
 		hello
 		hwtest # Hardware test
